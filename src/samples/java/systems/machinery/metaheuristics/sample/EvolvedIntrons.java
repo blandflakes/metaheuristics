@@ -1,7 +1,7 @@
-package org.machinery.metaheuristics.sample;
+package systems.machinery.metaheuristics.sample;
 
-import org.machinery.metaheuristics.evolution.GenePool;
-import org.machinery.metaheuristics.evolution.IntelligentDesign;
+import systems.machinery.metaheuristics.evolution.GenePool;
+import systems.machinery.metaheuristics.evolution.IntelligentDesign;
 
 import java.io.BufferedReader;
 import java.io.IOException;

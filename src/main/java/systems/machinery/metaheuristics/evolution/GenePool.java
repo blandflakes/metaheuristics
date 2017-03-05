@@ -1,4 +1,4 @@
-package org.machinery.metaheuristics.evolution;
+package systems.machinery.metaheuristics.evolution;
 
 import java.util.ArrayList;
 import java.util.List;

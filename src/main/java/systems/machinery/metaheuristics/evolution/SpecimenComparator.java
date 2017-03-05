@@ -1,4 +1,4 @@
-package org.machinery.metaheuristics.evolution;
+package systems.machinery.metaheuristics.evolution;
 
 import java.util.Comparator;
 import java.util.List;
