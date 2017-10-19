@@ -3,10 +3,10 @@ package systems.machinery.metaheuristics.evolution;
 import java.util.List;
 
 /**
- * A design for a species to be evolved in a GenePool.
+ * A phenotype for a species to be evolved in a GenePool.
  * @param <T> the value type that each "gene" can take.
  */
-public interface IntelligentDesign<T>
+public interface Phenotype<T>
 {
     /**
      * The shape is used to specify which values may appear at which positions. It is an array of arrays -

@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 public final class GenePool<T>
 {
 
-    private final IntelligentDesign<T> design;
+    private final Phenotype<T> phenotype;
     private final int populationSize;
     private final float mutationProbability;
     private final double cullThreshold;
@@ -28,7 +28,7 @@ public final class GenePool<T>
     /**
      * Create a GenePool for evolving solutions.
      *
-     * @param design              this is a specification for the problem, which we'll use to construct candidate specimen and
+     * @param phenotype           this is a specification for the problem, which we'll use to construct candidate specimen and
      *                            mutate them.
      * @param populationSize      this is how many specimens we should include in each population. Should be an even number.
      * @param mutationProbability this is the probability that an individual value within a specimen is randomly mutated
@@ -38,10 +38,10 @@ public final class GenePool<T>
      *                            generation. They may also be selected for breeding. This is applied before cullThreshold
      *                            and should also be even.
      */
-    public GenePool(final IntelligentDesign<T> design, final int populationSize, final float mutationProbability,
+    public GenePool(final Phenotype<T> phenotype, final int populationSize, final float mutationProbability,
                     final Optional<Double> cullThreshold, final Optional<Integer> eliteChildren)
     {
-        this.design = Objects.requireNonNull(design);
+        this.phenotype = Objects.requireNonNull(phenotype);
         if (populationSize % 2 != 0)
         {
             throw new IllegalArgumentException("Population size must be an even number, got " + populationSize);
@@ -81,7 +81,7 @@ public final class GenePool<T>
 
     private List<List<T>> evolve(final List<List<T>> currentPopulation)
     {
-        final List<List<T>> next = new ArrayList<>(design.shape().size());
+        final List<List<T>> next = new ArrayList<>(phenotype.shape().size());
         if (eliteChildren > 0)
         {
             copyElite(currentPopulation, next);
@@ -110,7 +110,7 @@ public final class GenePool<T>
         // Rather than sorting, lets do a single pass, and collect them in a priority queue. This can be
         // expanded with heuristics based on the number of the children compared to the size of the population in
         // the future.
-        final PriorityQueue<List<T>> elite = new PriorityQueue<>(eliteChildren, new SpecimenComparator<>(design));
+        final PriorityQueue<List<T>> elite = new PriorityQueue<>(eliteChildren, new SpecimenComparator<>(phenotype));
         for (final List<T> specimen : current)
         {
             if (elite.size() < eliteChildren)
@@ -119,7 +119,7 @@ public final class GenePool<T>
             }
             else
             {
-                if (design.fitness(elite.peek()) < design.fitness(specimen))
+                if (phenotype.fitness(elite.peek()) < phenotype.fitness(specimen))
                 {
                     elite.remove();
                     elite.add(specimen);
@@ -137,7 +137,7 @@ public final class GenePool<T>
         final List<List<T>> survivors = new ArrayList<>();
         for (final List<T> specimen : current)
         {
-            if (design.fitness(specimen) > cullThreshold)
+            if (phenotype.fitness(specimen) > cullThreshold)
             {
                 survivors.add(specimen);
             }
@@ -157,7 +157,7 @@ public final class GenePool<T>
 
     private List<T> randomSpecimen()
     {
-        final List<List<T>> shape = design.shape();
+        final List<List<T>> shape = phenotype.shape();
         final List<T> specimen = new ArrayList<>(shape.size());
         for (List<T> candidates : shape)
         {
@@ -181,7 +181,7 @@ public final class GenePool<T>
     // Mutates population, adding two new children created from mating parent1 and parent2
     private void mate(final List<T> parent1, final List<T> parent2, final List<List<T>> population)
     {
-        final List<List<T>> shape = design.shape();
+        final List<List<T>> shape = phenotype.shape();
         final int size = shape.size();
         final List<T> child1 = new ArrayList<>(size);
         final List<T> child2 = new ArrayList<>(size);
@@ -234,7 +234,7 @@ public final class GenePool<T>
     }
 
     /**
-     * Generates an initial population according to the configured design and returns an ordered stream
+     * Generates an initial population according to the configured phenotype and returns an ordered stream
      * which, when iterated, should show a population evolving towards higher fitness scores.
      * @return an ordered stream, starting with a generated initial population, converging on a population
      * with higher fitness scores.

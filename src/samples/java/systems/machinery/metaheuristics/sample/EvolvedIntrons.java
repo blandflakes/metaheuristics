@@ -1,7 +1,7 @@
 package systems.machinery.metaheuristics.sample;
 
 import systems.machinery.metaheuristics.evolution.GenePool;
-import systems.machinery.metaheuristics.evolution.IntelligentDesign;
+import systems.machinery.metaheuristics.evolution.Phenotype;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,7 +36,7 @@ import java.util.stream.Stream;
 public final class EvolvedIntrons
 {
 
-    private static final class IntronsDesign implements IntelligentDesign<IntronsDesign.Expressed>
+    private static final class IntronsPhenotype implements Phenotype<IntronsPhenotype.Expressed>
     {
         // This enum lets us avoid autoboxing with the generic types.
         enum Expressed
@@ -49,7 +49,7 @@ public final class EvolvedIntrons
         private final char[] sequence;
         private final List<String> reads;
 
-        private IntronsDesign(final String sequence, final List<String> reads)
+        private IntronsPhenotype(final String sequence, final List<String> reads)
         {
             this.sequence = sequence.toCharArray();
             this.length = sequence.length();
@@ -100,13 +100,13 @@ public final class EvolvedIntrons
         }
     }
 
-    private static List<IntronsDesign.Expressed> findBest(final IntronsDesign design, final List<List<IntronsDesign.Expressed>> generation)
+    private static List<IntronsPhenotype.Expressed> findBest(final IntronsPhenotype phenotype, final List<List<IntronsPhenotype.Expressed>> generation)
     {
         double maxScore = -1;
-        List<IntronsDesign.Expressed> bestSpecimen = null;
-        for (final List<IntronsDesign.Expressed> specimen : generation)
+        List<IntronsPhenotype.Expressed> bestSpecimen = null;
+        for (final List<IntronsPhenotype.Expressed> specimen : generation)
         {
-            final double fitness = design.fitness(specimen);
+            final double fitness = phenotype.fitness(specimen);
             if (fitness > maxScore)
             {
                 bestSpecimen = specimen;
@@ -137,14 +137,14 @@ public final class EvolvedIntrons
             System.exit(1);
             return;
         }
-        final IntronsDesign design = new IntronsDesign(sequence, reads);
-        final GenePool<IntronsDesign.Expressed> genePool =
-                new GenePool<>(design, 10000, 0.25f, Optional.of(40d), Optional.of(2));
+        final IntronsPhenotype phenotype = new IntronsPhenotype(sequence, reads);
+        final GenePool<IntronsPhenotype.Expressed> genePool =
+                new GenePool<>(phenotype, 10000, 0.25f, Optional.of(40d), Optional.of(2));
         // let's do 10,000 generations
-        final Stream<List<List<IntronsDesign.Expressed>>> stream = genePool.stream().limit(100000);
-        final Iterator<List<List<IntronsDesign.Expressed>>> generationIterator = stream.iterator();
+        final Stream<List<List<IntronsPhenotype.Expressed>>> stream = genePool.stream().limit(100000);
+        final Iterator<List<List<IntronsPhenotype.Expressed>>> generationIterator = stream.iterator();
 
-        List<List<IntronsDesign.Expressed>> lastGeneration;
+        List<List<IntronsPhenotype.Expressed>> lastGeneration;
         do
         {
             lastGeneration = generationIterator.next();
@@ -152,9 +152,9 @@ public final class EvolvedIntrons
         while (generationIterator.hasNext());
         // So now we have the last generation, let's find the best answer
         // Iterate so that this is a fair comparison.
-        final List<IntronsDesign.Expressed> bestSpecimen = findBest(design, lastGeneration);
+        final List<IntronsPhenotype.Expressed> bestSpecimen = findBest(phenotype, lastGeneration);
         System.out.println("Best shot: " + bestSpecimen);
-        System.out.println("Decoded: " + design.decode(bestSpecimen));
-        System.out.println("Score: " + design.fitness(bestSpecimen));
+        System.out.println("Decoded: " + phenotype.decode(bestSpecimen));
+        System.out.println("Score: " + phenotype.fitness(bestSpecimen));
     }
 }
